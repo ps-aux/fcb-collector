@@ -31,7 +31,7 @@ def check_required_arg(*args):
 def save_response(response, file_name, path='~/tmp/fcb-analyzer'):
     """Write response text to a file """
     
-    path = ensure_path()
+    path = ensure_path(path)
     f = open(path + '/' + file_name, 'w')
     f.write(response.text)
 
