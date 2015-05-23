@@ -1,5 +1,5 @@
 from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException,\
+from selenium.common.exceptions import NoSuchElementException, \
     StaleElementReferenceException
 import time, re, utils, requests
 from utils import log
@@ -29,7 +29,7 @@ class FcbBrowserScrapper:
 
 
     def scrap_group_members(self, group_id):
-        #Wait interval for more members to be loaded - in seconds.
+        # Wait interval for more members to be loaded - in seconds.
         sleep_interval = 2
         url = 'https://www.facebook.com/groups/{}/members'.format(group_id)
 
@@ -91,7 +91,7 @@ class FcbBrowserScrapper:
         no_such_el_count = 0
         unprocessed_ids = []
         bad_page_ids = []
-        html_file = open(directory + '/index.html','w',encoding='utf-8')
+        html_file = open(directory + '/index.html', 'w', encoding='utf-8')
         html_file.write('<html><body>\n')
 
         for user in users:
@@ -109,7 +109,7 @@ class FcbBrowserScrapper:
 
                 while True:
                     try:
-                        img_el =  self.browser.find_element_by_class_name('spotlight')
+                        img_el = self.browser.find_element_by_class_name('spotlight')
                         break
                     except NoSuchElementException:
                             try:
@@ -117,21 +117,21 @@ class FcbBrowserScrapper:
                                 break
                             except NoSuchElementException:
                                 pass
-                    #The ajax call has not finished yet so lets wait 1 second
-                    #and repeat it again
+                    # The ajax call has not finished yet so lets wait 1 second
+                    # and repeat it again
                     time.sleep(1)
                 
                 try:
                     pic_url = img_el.get_attribute('src')
                 except StaleElementReferenceException:
-                    stale_count +=1
+                    stale_count += 1
                     utils.log('Stale element encountered ({})'.format(stale_count))
                     unprocessed_ids.append(user_id)
                     continue
 
-                #Retrieve and... 
+                # Retrieve and... 
                 response = requests.get(pic_url)
-                #...save the photo
+                # ...save the photo
                 photo_file = open(directory + '/pics/{}.jpg'.format(user_id), 'wb')
                 photo_file.write(response.content)
 
@@ -154,12 +154,12 @@ class FcbBrowserScrapper:
 
         
 def main():
-    #Basic configuration
+    # Basic configuration
     data_dir = utils.ensure_path('~/data_analysis/fcb/')
 #     group_id = 153748404666241
     group_id = 597682743580084
     
-    #Load basic arguments
+    # Load basic arguments
     log("Parsing basic arguments")
     missing_arg = utils.check_required_arg(utils.login_opt, utils.password_opt, utils.ch_driver_opt)
     if missing_arg is not None:
@@ -173,23 +173,28 @@ def main():
     browser = webdriver.Chrome(executable_path=driver_path)
 
     scrapper = FcbBrowserScrapper(browser, login, password)
+    scrapper.log_in()
+    
+    # Scrap
     users = scrapper.scrap_group_members(group_id)
 
-    
-    #Temporary code for loading user from file rather from the web
-    #to speed up the development
+#     Temporary code for loading user from file rather from the web
+#     to speed up the development
 #     users_file = utils.ensure_path('~/data_analysis/mlyny_group.txt')
+#     utils.save_data(users, users_file)
 #     users = []
-#     with open(users_file,  encoding='utf-8') as f:
+#     with open(users_file, encoding='utf-8') as f:
 #         for line in f:
 #             if line == '':
 #                 break
 #             s = line.split(',')
 #             users.append((s[0], s[1]))
 
-    
-    scrapper.log_in()
+    # Process
     scrapper.process_users(users, data_dir)
+    
+
+    
  
     log('Closing the browser')
     browser.close()
