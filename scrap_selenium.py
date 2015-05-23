@@ -147,9 +147,9 @@ class FcbBrowserScrapper:
             page_row = '<a href="{}"><img src="pics/{}" title="{}"></a>'.format(url, user_id + '.jpg', user[0])
             html_file.write(page_row + '\n')
 
-        utils.log('Total staled: ' + stale_count)
-        utils.log('Total not found: ' + no_such_el_count)
-        utils.log('Unprocessed ids:' + unprocessed_ids)
+        utils.log('Total staled: {}'.format(stale_count))
+        utils.log('Total not found: {}'.format(no_such_el_count))
+        utils.log('Unprocessed ids: {}'.format(unprocessed_ids))
         html_file.write('</body></html>')
 
         
