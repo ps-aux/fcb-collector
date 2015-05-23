@@ -35,6 +35,14 @@ def save_response(response, file_name, path='~/tmp/fcb-analyzer'):
     f = open(path + '/' + file_name, 'w')
     f.write(response.text)
 
+def save_data(data,file):
+    """Save a data sequence containing pair (2-tuples) to a file."""
+
+    f = open(file, mode='w',encoding='utf-8', buffering=1024)
+    for t in data:
+        f.write(str(t[0]) + ', ' + str(t[1]) + '\n')
+    f.close()
+    
 
 def ensure_path(path):
     """"
@@ -58,4 +66,6 @@ def log(msg):
     print(msg)
 
 main()
+
+
 
